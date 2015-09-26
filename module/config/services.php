@@ -12,6 +12,7 @@
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
+use League\Flysystem\Plugin;
 use Netzmacht\Contao\Flysystem\Adapter\DbafsAdapter;
 
 global $container;
@@ -49,11 +50,11 @@ $container['flysystem.local.permissions'] = array();
 $container['flysystem.local.plugins'] = $container->share(
     function () {
         $plugins   = new \ArrayObject();
-        $plugins[] = new \League\Flysystem\Plugin\GetWithMetadata();
-        $plugins[] = new \League\Flysystem\Plugin\ListFiles();
-        $plugins[] = new \League\Flysystem\Plugin\ListPaths();
-        $plugins[] = new \League\Flysystem\Plugin\ListWith();
-        $plugins[] = new \League\Flysystem\Plugin\EmptyDir();
+        $plugins[] = new Plugin\GetWithMetadata();
+        $plugins[] = new Plugin\ListFiles();
+        $plugins[] = new Plugin\ListPaths();
+        $plugins[] = new Plugin\ListWith();
+        $plugins[] = new Plugin\EmptyDir();
 
         return $plugins;
     }
@@ -126,11 +127,11 @@ if (!isset($container['flysystem.dbafs.adapter'])) {
 $container['flysystem.dbafs.plugins'] = $container->share(
     function () {
         $plugins   = new \ArrayObject();
-        $plugins[] = new \League\Flysystem\Plugin\GetWithMetadata();
-        $plugins[] = new \League\Flysystem\Plugin\ListFiles();
-        $plugins[] = new \League\Flysystem\Plugin\ListPaths();
-        $plugins[] = new \League\Flysystem\Plugin\ListWith();
-        $plugins[] = new \League\Flysystem\Plugin\EmptyDir();
+        $plugins[] = new Plugin\GetWithMetadata();
+        $plugins[] = new Plugin\ListFiles();
+        $plugins[] = new Plugin\ListPaths();
+        $plugins[] = new Plugin\ListWith();
+        $plugins[] = new Plugin\EmptyDir();
 
         return $plugins;
     }
