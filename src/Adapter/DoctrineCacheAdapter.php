@@ -20,6 +20,7 @@ use League\Flysystem\Config;
  * Class DoctrineCacheAdapter.
  *
  * @package Netzmacht\Contao\Flysystem\Adapter
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DoctrineCacheAdapter extends AbstractAdapter
 {
@@ -51,7 +52,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
      * @param Cache            $cache    Cache.
      * @param int              $lifeTime Cache lifetime.
      */
-    public function __construct(AdapterInterface $adapter, Cache $cache, $lifeTime=0)
+    public function __construct(AdapterInterface $adapter, Cache $cache, $lifeTime = 0)
     {
         $this->adapter  = $adapter;
         $this->cache    = $cache;
@@ -59,7 +60,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function write($path, $contents, Config $config)
     {
@@ -73,7 +74,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function writeStream($path, $resource, Config $config)
     {
@@ -87,7 +88,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function update($path, $contents, Config $config)
     {
@@ -101,7 +102,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function updateStream($path, $resource, Config $config)
     {
@@ -115,7 +116,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function rename($path, $newpath)
     {
@@ -129,7 +130,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function copy($path, $newpath)
     {
@@ -137,7 +138,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function delete($path)
     {
@@ -151,7 +152,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function deleteDir($dirname)
     {
@@ -165,7 +166,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function createDir($dirname, Config $config)
     {
@@ -173,7 +174,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function setVisibility($path, $visibility)
     {
@@ -189,7 +190,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function has($path)
     {
@@ -202,7 +203,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function read($path)
     {
@@ -210,7 +211,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function readStream($path)
     {
@@ -218,7 +219,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function listContents($directory = '', $recursive = false)
     {
@@ -237,7 +238,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMetadata($path)
     {
@@ -247,7 +248,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getSize($path)
     {
@@ -257,7 +258,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMimetype($path)
     {
@@ -267,7 +268,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getTimestamp($path)
     {
@@ -277,7 +278,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getVisibility($path)
     {
@@ -313,7 +314,7 @@ class DoctrineCacheAdapter extends AbstractAdapter
     /**
      * Create the cache key.
      *
-     * @param string $path
+     * @param string $path The file path.
      *
      * @return string
      */

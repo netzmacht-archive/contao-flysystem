@@ -20,7 +20,7 @@ use League\Flysystem\RootViolationException;
 /**
  * The DbafsAdapter provides access to the database driven file system of Contao.
  *
- * @package Netzmacht\Contao\Flysystem\Adapter
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
 {
@@ -41,7 +41,7 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
     /**
      * DbafsAdapter constructor.
      *
-     * @param AdapterInterface $adapter  The local file system adapter.
+     * @param AdapterInterface $adapter    The local file system adapter.
      * @param string           $uploadPath Base path is the uploadPath of Contao.
      */
     public function __construct(AdapterInterface $adapter, $uploadPath = 'files')
@@ -396,7 +396,8 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
      * @param mixed  $pathOrUuid Given path or uuid.
      * @param string $path       The converted path.
      *
-     * @throws FileNotFoundException
+     * @return void
+     * @throws FileNotFoundException When file is not found.
      */
     private function guardNoInvalidUuid($pathOrUuid, $path)
     {
@@ -426,6 +427,7 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
      *
      * @param string $path Given path.
      *
+     * @return void
      * @throws RootViolationException When path is not in the upload path.
      */
     private function guardInUploadPath($path)
