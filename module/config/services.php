@@ -62,11 +62,19 @@ $container['flysystem.local.plugins'] = $container->share(
 /*
  * Local file system adapter.
  */
-$container['flysystem.local.adapter'] = $container->share(
+$container['flysystem.local.adapter.default'] = $container->share(
     function ($container) {
         return new Local(TL_ROOT, $container['flysystem.local.lock'], $container['flysystem.local.permissions']);
     }
 );
+
+if (!isset($container['flysystem.local.adapter'])) {
+    $container['flysystem.local.adapter'] = $container->share(
+        function ($container) {
+            return $container['flysystem.local.adapter.default'];
+        }
+    );
+}
 
 /*
  * Local file system.
@@ -98,11 +106,19 @@ $container['flysystem.dbafs.upload-path'] = function ($container) {
 /*
  * Dbafs file system adapter.
  */
-$container['flysystem.dbafs.adapter'] = $container->share(
+$container['flysystem.dbafs.adapter.default'] = $container->share(
     function ($container) {
         return new DbafsAdapter($container['flysystem.local.adapter'], $container['flysystem.dbafs.upload-path']);
     }
 );
+
+if (!isset($container['flysystem.dbafs.adapter'])) {
+    $container['flysystem.dbafs.adapter'] = $container->share(
+        function ($container) {
+            return $container['flysystem.dbafs.adapter.default'];
+        }
+    );
+}
 
 /*
  * File system plugins registry.
