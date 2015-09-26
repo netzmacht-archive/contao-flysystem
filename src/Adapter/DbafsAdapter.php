@@ -22,7 +22,7 @@ use League\Flysystem\RootViolationException;
  *
  * @package Netzmacht\Contao\Flysystem\Adapter
  */
-class DbafsAdapter extends AbstractAdapter
+class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
 {
     /**
      * The local file system adapter.
@@ -353,6 +353,19 @@ class DbafsAdapter extends AbstractAdapter
         $this->guardInUploadPath($path);
 
         return $this->adapter->getVisibility($path);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getCacheKey($path)
+    {
+        $path = $this->convertToPath($path);
+        if ($path === false) {
+            return null;
+        }
+
+        return md5($path);
     }
 
     /**

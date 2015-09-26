@@ -9,11 +9,15 @@
  *
  */
 
+use Doctrine\Common\Cache\ApcCache;
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\FilesystemCache;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use League\Flysystem\Plugin;
 use Netzmacht\Contao\Flysystem\Adapter\DbafsAdapter;
+use Netzmacht\Contao\Flysystem\Adapter\DoctrineCacheAdapter;
 
 global $container;
 
@@ -105,7 +109,7 @@ $container['flysystem.dbafs.upload-path'] = function ($container) {
 };
 
 /*
- * Dbafs file system adapter.
+ * Dbafs default file system adapter.
  */
 $container['flysystem.dbafs.adapter.default'] = $container->share(
     function ($container) {
@@ -113,9 +117,47 @@ $container['flysystem.dbafs.adapter.default'] = $container->share(
     }
 );
 
+/*
+ * Dbafs cached file system adapter.
+ */
+$container['flysystem.dbafs.cache.file'] = $container->share(
+    function () {
+        return new FilesystemCache(TL_ROOT . '/system/cache/flysystem/dbafs');
+    }
+);
+
+$container['flysystem.dbafs.cache.array'] = $container->share(
+    function () {
+        return new ArrayCache();
+    }
+);
+
+$container['flysystem.dbafs.cache.apc'] = $container->share(
+    function () {
+        return new ApcCache();
+    }
+);
+
+$container['flysystem.dbafs.adapter.cached'] = $container->share(
+    function ($container) {
+        return new DoctrineCacheAdapter(
+            $container['flysystem.dbafs.adapter.default'],
+            $container['flysystem.dbafs.cache.' . $container['config']->get('flysystem_cache')],
+            $container['config']->get('flysystem_lifetime') ?: 0
+        );
+    }
+);
+
+/*
+ * The adapter entry point.
+ */
 if (!isset($container['flysystem.dbafs.adapter'])) {
     $container['flysystem.dbafs.adapter'] = $container->share(
         function ($container) {
+            if ($container['config']->get('flysystem_cache')) {
+                return $container['flysystem.dbafs.adapter.cached'];
+            }
+
             return $container['flysystem.dbafs.adapter.default'];
         }
     );
