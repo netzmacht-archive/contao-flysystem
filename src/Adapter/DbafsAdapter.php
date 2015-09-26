@@ -12,39 +12,42 @@
 namespace Netzmacht\Contao\Flysystem\Adapter;
 
 use League\Flysystem\Adapter\AbstractAdapter;
+use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\RootViolationException;
 
 /**
  * The DbafsAdapter provides access to the database driven file system of Contao.
- * 
+ *
  * @package Netzmacht\Contao\Flysystem\Adapter
  */
 class DbafsAdapter extends AbstractAdapter
 {
     /**
-     * @var FileSystemInterface
+     * The local file system adapter.
+     *
+     * @var AdapterInterface
      */
-    private $fileSystem;
+    private $adapter;
 
     /**
      * The base path.
      *
      * @var string
      */
-    private $basePath;
+    private $uploadPath;
 
     /**
      * DbafsAdapter constructor.
      *
-     * @param FilesystemInterface $fileSystem The local file system.
-     * @param string              $basePath   The base path is usually the contao upload path.
+     * @param AdapterInterface $adapter  The local file system adapter.
+     * @param string           $uploadPath Base path is the uploadPath of Contao.
      */
-    public function __construct(FilesystemInterface $fileSystem, $basePath = 'files')
+    public function __construct(AdapterInterface $adapter, $uploadPath = 'files')
     {
-        $this->fileSystem = $fileSystem;
-        $this->basePath   = $basePath . '/';
+        $this->adapter    = $adapter;
+        $this->uploadPath = $uploadPath;
     }
 
     /**
@@ -52,7 +55,9 @@ class DbafsAdapter extends AbstractAdapter
      */
     public function write($path, $contents, Config $config)
     {
-        if ($this->fileSystem->write($this->basePath. $path, $contents, $config)) {
+        $this->guardInUploadPath($path);
+
+        if ($this->adapter->write($path, $contents, $config)) {
             \Dbafs::addResource($path);
             
             return true;
@@ -66,7 +71,9 @@ class DbafsAdapter extends AbstractAdapter
      */
     public function writeStream($path, $resource, Config $config)
     {
-        if ($this->fileSystem->writeStream($this->basePath. $path, $resource, $config)) {
+        $this->guardInUploadPath($path);
+
+        if ($this->adapter->writeStream($path, $resource, $config)) {
             \Dbafs::addResource($path);
 
             return true;
@@ -82,9 +89,10 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        if ($this->fileSystem->update($this->basePath. $path, $contents, $config)) {
-            \Dbafs::addResource($this->basePath. $path);
+        if ($this->adapter->update($path, $contents, $config)) {
+            \Dbafs::addResource($path);
             return true;
         }
 
@@ -98,9 +106,10 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        if ($this->fileSystem->updateStream($this->basePath. $path, $resource, $config)) {
-            \Dbafs::addResource($this->basePath. $path);
+        if ($this->adapter->updateStream($path, $resource, $config)) {
+            \Dbafs::addResource($path);
             return true;
         }
 
@@ -114,9 +123,11 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
-        
-        if ($this->fileSystem->rename($this->basePath. $path, $this->basePath. $newpath)) {
-            \Dbafs::moveResource($this->basePath. $path, $this->basePath. $newpath);
+        $this->guardInUploadPath($path);
+        $this->guardInUploadPath($newpath);
+
+        if ($this->adapter->rename($path, $newpath)) {
+            \Dbafs::moveResource($path, $newpath);
             return true;
         }
 
@@ -130,9 +141,11 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
+        $this->guardInUploadPath($newpath);
 
-        if ($this->fileSystem->copy($this->basePath. $path, $this->basePath. $newpath)) {
-            \Dbafs::copyResource($this->basePath . $path, $this->basePath . $newpath);
+        if ($this->adapter->copy($path, $newpath)) {
+            \Dbafs::copyResource($path, $newpath);
 
             return true;
         }
@@ -147,9 +160,10 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
         
-        if ($this->fileSystem->delete($this->basePath . $path)) {
-            \Dbafs::deleteResource($this->basePath . $path);
+        if ($this->adapter->delete($path)) {
+            \Dbafs::deleteResource($path);
             return true;
         }
 
@@ -163,9 +177,10 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        if ($this->fileSystem->deleteDir($this->basePath . $path)) {
-            \Dbafs::deleteResource($this->basePath . $path);
+        if ($this->adapter->deleteDir($path)) {
+            \Dbafs::deleteResource($path);
             return true;
         }
 
@@ -177,8 +192,10 @@ class DbafsAdapter extends AbstractAdapter
      */
     public function createDir($dirname, Config $config)
     {
-        if ($this->fileSystem->createDir($this->basePath. $dirname, $config)) {
-            \Dbafs::addResource($this->basePath. $dirname);
+        $this->guardInUploadPath($dirname);
+
+        if ($this->adapter->createDir($dirname, $config)) {
+            \Dbafs::addResource($dirname);
 
             return true;
         }
@@ -193,8 +210,9 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        return $this->fileSystem->setVisibility($this->basePath . $path, $visibility);
+        return $this->adapter->setVisibility($path, $visibility);
     }
 
     /**
@@ -203,11 +221,13 @@ class DbafsAdapter extends AbstractAdapter
     public function has($pathOrUuid)
     {
         $path = $this->convertToPath($pathOrUuid);
+        $this->guardInUploadPath($path);
+
         if ($path === false) {
             return false;
         }
 
-        return $this->fileSystem->has($this->basePath . $path);
+        return $this->adapter->has($path);
     }
 
     /**
@@ -217,8 +237,9 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        return $this->fileSystem->read($this->basePath . $path);
+        return $this->adapter->read($path);
     }
 
     /**
@@ -228,8 +249,9 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        return $this->fileSystem->read($path);
+        return $this->adapter->read($path);
     }
 
     /**
@@ -241,9 +263,13 @@ class DbafsAdapter extends AbstractAdapter
             $raw       = $directory;
             $directory = $this->convertToPath($raw);
             $this->guardNoInvalidUuid($raw, $directory);
+        } else {
+            $directory = $this->uploadPath;
         }
 
-        return $this->fileSystem->listContents($this->basePath . $directory, $recursive);
+        $this->guardInUploadPath($directory);
+
+        return $this->adapter->listContents($directory, $recursive);
     }
 
     /**
@@ -253,11 +279,29 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        $metadata = $this->fileSystem->getMetadata($this->basePath . $path);
-        if ($metadata && \Validator::isUuid($pathOrUuid)) {
-            $model            = \FilesModel::findByUuid($metadata);
-            $metadata['meta'] = deserialize($model->meta, true);
+        $metadata = $this->adapter->getMetadata($path);
+        if ($metadata) {
+            if (\Validator::isUuid($pathOrUuid)) {
+                $model = \FilesModel::findByUuid($metadata);
+            } else {
+                $model = \FilesModel::findOneBy('path', $path);
+            }
+
+            if ($model) {
+                $metadata['id']   = (int) $model->id;
+                $metadata['uuid'] = \String::binToUuid($model->uuid);
+                $metadata['hash'] = $model->hash;
+                $metadata['meta'] = deserialize($model->meta, true);
+
+                $metadata['importantPart'] = array(
+                    'x'      => $model->importantPartX,
+                    'y'      => $model->importantPartY,
+                    'width'  => $model->importantPartWidth,
+                    'height' => $model->importantPartHeight
+                );
+            }
         }
 
         return $metadata;
@@ -270,8 +314,9 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        return $this->fileSystem->getSize($this->basePath . $path);
+        return $this->adapter->getSize($path);
     }
 
     /**
@@ -281,8 +326,9 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        return $this->fileSystem->getMimetype($this->basePath . $path);
+        return $this->adapter->getMimetype($path);
     }
 
     /**
@@ -292,8 +338,9 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        return $this->fileSystem->getTimestamp($this->basePath . $path);
+        return $this->adapter->getTimestamp($path);
     }
 
     /**
@@ -303,8 +350,9 @@ class DbafsAdapter extends AbstractAdapter
     {
         $path = $this->convertToPath($pathOrUuid);
         $this->guardNoInvalidUuid($pathOrUuid, $path);
+        $this->guardInUploadPath($path);
 
-        return $this->fileSystem->getVisibility($this->basePath . $path);
+        return $this->adapter->getVisibility($path);
     }
 
     /**
@@ -358,5 +406,19 @@ class DbafsAdapter extends AbstractAdapter
         }
 
         return $uuid;
+    }
+
+    /**
+     * Guard that the path is in the upload path.
+     *
+     * @param string $path Given path.
+     *
+     * @throws RootViolationException When path is not in the upload path.
+     */
+    private function guardInUploadPath($path)
+    {
+        if (substr($path, 0, strlen($this->uploadPath)) !== $this->uploadPath) {
+            throw new RootViolationException(sprintf('Path "%s" is not in upload path', $path));
+        }
     }
 }

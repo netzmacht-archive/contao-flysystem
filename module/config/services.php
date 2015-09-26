@@ -69,8 +69,8 @@ $container['flysystem.local.file-system'] = $container->share(
 /*
  * Dbafs file system config.
  */
-$container['flysystem.dbafs.base-path'] = function ($container) {
-    return $container['config']->get('websitePath');
+$container['flysystem.dbafs.upload-path'] = function ($container) {
+    return $container['config']->get('uploadPath');
 };
 
 /*
@@ -78,14 +78,14 @@ $container['flysystem.dbafs.base-path'] = function ($container) {
  */
 $container['flysystem.dbafs.adapter'] = $container->share(
     function ($container) {
-        return new DbafsAdapter($container['flysystem.local.file-system'], $container['flysystem.dbafs.base-path']);
+        return new DbafsAdapter($container['flysystem.local.adapter'], $container['flysystem.dbafs.upload-path']);
     }
 );
 
 /*
  * Dbafs file system.
  */
-$container['flysyste.dbafs.file-system'] = $container->share(
+$container['flysystem.dbafs.file-system'] = $container->share(
     function ($container) {
         return new Filesystem($container['flysystem.dbafs.adapter']);
     }
