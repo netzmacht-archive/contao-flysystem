@@ -284,7 +284,7 @@ class DbafsAdapter extends AbstractAdapter
         $metadata = $this->adapter->getMetadata($path);
         if ($metadata) {
             if (\Validator::isUuid($pathOrUuid)) {
-                $model = \FilesModel::findByUuid($metadata);
+                $model = \FilesModel::findByUuid($pathOrUuid);
             } else {
                 $model = \FilesModel::findOneBy('path', $path);
             }
