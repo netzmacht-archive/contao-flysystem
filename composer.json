@@ -28,7 +28,6 @@
     "contao/core": ">=3.2,<3.6-dev",
     "contao-community-alliance/dependency-container": "~1.6",
     "league/flysystem": "~1",
-    "league/flysystem-cached-adapter": "~1",
     "doctrine/cache": "~1"
   },
   "require-dev": {
