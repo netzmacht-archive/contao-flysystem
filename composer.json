@@ -1,0 +1,52 @@
+{
+  "name": "netzmacht/contao-flysystem",
+  "description": "This integrates the flysystem filesystem abstraction into Contao",
+  "keywords": [
+    "contao",
+    "flysyste",
+    "filesystem",
+    "filesystems",
+    "abstraction"
+  ],
+  "type": "contao-module",
+  "license": "LGPL-3.0+",
+  "authors": [
+    {
+      "name": "David Molineus",
+      "email": "mail@netzmacht.de",
+      "homepage": "http://www.netzmacht.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "mail@netzmacht.de",
+    "issues": "https://github.com/netzmacht/contao-flysystem/issues",
+    "source": "https://github.com/netzmacht/contao-flysystem"
+  },
+  "require": {
+    "php": ">=5.4",
+    "contao/core": ">=3.2,<3.6-dev",
+    "contao-community-alliance/dependency-container": "~1.6",
+    "league/flysystem": "~1"
+  },
+  "require-dev": {
+    "netzmacht/contao-build-tools": "~1.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Netzmacht\\Contao\\Flysystem\\": "src/"
+    }
+  },
+  "prefer-stable": true,
+  "minimum-stability": "dev",
+  "extra": {
+    "contao": {
+      "sources": {
+        "module": "system/modules/flysystem"
+      }
+    },
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
+}
