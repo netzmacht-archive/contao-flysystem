@@ -44,6 +44,22 @@ $container['flysystem.local.lock'] = LOCK_EX;
 $container['flysystem.local.permissions'] = array();
 
 /*
+ * File system plugins registry.
+ */
+$container['flysystem.local.plugins'] = $container->share(
+    function () {
+        $plugins   = new \ArrayObject();
+        $plugins[] = new \League\Flysystem\Plugin\GetWithMetadata();
+        $plugins[] = new \League\Flysystem\Plugin\ListFiles();
+        $plugins[] = new \League\Flysystem\Plugin\ListPaths();
+        $plugins[] = new \League\Flysystem\Plugin\ListWith();
+        $plugins[] = new \League\Flysystem\Plugin\EmptyDir();
+
+        return $plugins;
+    }
+);
+
+/*
  * Local file system adapter.
  */
 $container['flysystem.local.adapter'] = $container->share(
@@ -57,7 +73,13 @@ $container['flysystem.local.adapter'] = $container->share(
  */
 $container['flysystem.local.file-system'] = $container->share(
     function ($container) {
-        return new Filesystem($container['flysystem.local.adapter']);
+        $fileSystem = new Filesystem($container['flysystem.local.adapter']);
+
+        foreach ($container['flysystem.local.plugins'] as $plugin) {
+            $fileSystem->addPlugin($plugin);
+        }
+
+        return $fileSystem;
     }
 );
 
@@ -83,11 +105,33 @@ $container['flysystem.dbafs.adapter'] = $container->share(
 );
 
 /*
+ * File system plugins registry.
+ */
+$container['flysystem.dbafs.plugins'] = $container->share(
+    function () {
+        $plugins   = new \ArrayObject();
+        $plugins[] = new \League\Flysystem\Plugin\GetWithMetadata();
+        $plugins[] = new \League\Flysystem\Plugin\ListFiles();
+        $plugins[] = new \League\Flysystem\Plugin\ListPaths();
+        $plugins[] = new \League\Flysystem\Plugin\ListWith();
+        $plugins[] = new \League\Flysystem\Plugin\EmptyDir();
+
+        return $plugins;
+    }
+);
+
+/*
  * Dbafs file system.
  */
 $container['flysystem.dbafs.file-system'] = $container->share(
     function ($container) {
-        return new Filesystem($container['flysystem.dbafs.adapter']);
+        $fileSystem = new Filesystem($container['flysystem.dbafs.adapter']);
+
+        foreach ($container['flysystem.dbafs.plugins'] as $plugin) {
+            $fileSystem->addPlugin($plugin);
+        }
+
+        return $fileSystem;
     }
 );
 
