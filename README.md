@@ -71,7 +71,7 @@ $metadata = $fileSystem->getMetadata('files/path/to/file');
 // Get file by binary uuid.
 $metadata = $fileSystem->getMetadata($this->singleSRC);
 
-// Get file by binary uuid.
+// Get file by string uuid.
 $metadata = $fileSystem->getMetadata(\String::binToUuid($this->singleSRC));
 
 ```
