@@ -33,7 +33,7 @@ Usage
 
 ### Access to the mount manager and the default file system
 
-```
+```php
 <?php
 
 // First get the mount manager to get the file system.
@@ -59,7 +59,7 @@ The meta data is enriched with model details `id, uuid, hash, meta, importantPar
 
 It keeps the dbafs in sync when performing file system actions.
 
-```
+```php
 <?php
  
 $manager    = $GLOBALS['container']['flysystem.mount-manager'];
