@@ -69,10 +69,10 @@ $fileSystem = $manager->getFilesystem('dbafs');
 $metadata = $fileSystem->getMetadata('files/path/to/file');
 
 // Get file by binary uuid.
-$metadata = $fileSystem->getMetadata($this->multiSRC);
+$metadata = $fileSystem->getMetadata($this->singleSRC);
 
 // Get file by binary uuid.
-$metadata = $fileSystem->getMetadata(\String::binToUuid($this->multiSRC));
+$metadata = $fileSystem->getMetadata(\String::binToUuid($this->singleSRC));
 
 ```
 
