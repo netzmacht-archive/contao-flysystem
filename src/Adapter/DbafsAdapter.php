@@ -58,8 +58,7 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
         $this->guardInUploadPath($path);
 
         if ($this->adapter->write($path, $contents, $config)) {
-            \Dbafs::addResource($path);
-            
+            $this->addResource($path);
             return true;
         }
         
@@ -74,8 +73,7 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
         $this->guardInUploadPath($path);
 
         if ($this->adapter->writeStream($path, $resource, $config)) {
-            \Dbafs::addResource($path);
-
+            $this->addResource($path);
             return true;
         }
 
@@ -92,7 +90,7 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
         $this->guardInUploadPath($path);
 
         if ($this->adapter->update($path, $contents, $config)) {
-            \Dbafs::addResource($path);
+            $this->addResource($path);
             return true;
         }
 
@@ -109,7 +107,7 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
         $this->guardInUploadPath($path);
 
         if ($this->adapter->updateStream($path, $resource, $config)) {
-            \Dbafs::addResource($path);
+            $this->addResource($path);
             return true;
         }
 
@@ -128,6 +126,7 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
 
         if ($this->adapter->rename($path, $newpath)) {
             \Dbafs::moveResource($path, $newpath);
+
             return true;
         }
 
@@ -164,6 +163,7 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
         
         if ($this->adapter->delete($path)) {
             \Dbafs::deleteResource($path);
+
             return true;
         }
 
@@ -195,8 +195,7 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
         $this->guardInUploadPath($dirname);
 
         if ($this->adapter->createDir($dirname, $config)) {
-            \Dbafs::addResource($dirname);
-
+            $this->addResource($dirname);
             return true;
         }
 
@@ -434,6 +433,24 @@ class DbafsAdapter extends AbstractAdapter implements ProvidesCacheKey
     {
         if (substr($path, 0, strlen($this->uploadPath)) !== $this->uploadPath) {
             throw new RootViolationException(sprintf('Path "%s" is not in upload path', $path));
+        }
+    }
+
+    /**
+     * Add resource to the database driven file system.
+     *
+     * @param string $path Given path.
+     *
+     * @return void
+     *
+     * @throws \Exception When adding resource failed.
+     */
+    private function addResource($path)
+    {
+        $fileModel = \FilesModel::findByPath($path);
+
+        if ($fileModel === null) {
+            \Dbafs::addResource($fileModel);
         }
     }
 }
